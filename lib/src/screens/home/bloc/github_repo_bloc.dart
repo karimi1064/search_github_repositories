@@ -4,14 +4,14 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:search_github_repositories/src/screens/home/model/repo_model.dart';
 
-import '../repository/repos_list_repository.dart';
+import '../repository/repos_list_repository_imp.dart';
 
 part 'github_repo_event.dart';
 
 part 'github_repo_state.dart';
 
 class GithubRepoBloc extends Bloc<GithubRepoEvent, GithubRepoState> {
-  final ReposListRepository repoRepository;
+  final ReposListRepositoryImp repoRepository;
   int page = 0;
   bool isFetching = false;
 
@@ -24,7 +24,7 @@ class GithubRepoBloc extends Bloc<GithubRepoEvent, GithubRepoState> {
       } else if (event is RepoFetchEvent) {
         emit(const GithubRepoLoadingState());
 
-        final response = await ReposListRepository.getRepos(
+        final response = await ReposListRepositoryImp().getRepos(
           page: page,
           query: event.query,
         );

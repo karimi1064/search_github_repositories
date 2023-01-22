@@ -13,7 +13,7 @@ RepoModel _$RepoModelFromJson(Map<String, dynamic> json) => RepoModel(
       description: json['description'] as String?,
       name: json['name'] as String?,
       owner: json['owner']['login'] as String?,
-    );
+);
 
 Map<String, dynamic> _$RepoModelToJson(RepoModel instance) => <String, dynamic>{
       'url': instance.htmlUrl,
@@ -22,4 +22,4 @@ Map<String, dynamic> _$RepoModelToJson(RepoModel instance) => <String, dynamic>{
       'description': instance.description,
       'name': instance.name,
       'owner': instance.owner,
-    };
+};

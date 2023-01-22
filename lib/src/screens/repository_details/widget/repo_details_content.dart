@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:search_github_repositories/src/screens/repository_details/bloc/details_bloc.dart';
 import 'package:search_github_repositories/src/screens/repository_details/model/repo_details_model.dart';
-import 'package:search_github_repositories/src/screens/repository_details/repository/repo_details_repository.dart';
+import 'package:search_github_repositories/src/screens/repository_details/repository/repo_details_repository_imp.dart';
 
 import '../../../constants/string_constants.dart';
 import '../../common_widget/app_refresh_search.dart';
@@ -28,7 +28,7 @@ class _RepoDetailsContentState extends State<RepoDetailsContent> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          DetailsBloc(repoDetailsRepository: RepoDetailsRepository()),
+          DetailsBloc(repoDetailsRepository: RepoDetailsRepositoryImp()),
       child: BlocConsumer<DetailsBloc, DetailsState>(
         buildWhen: (_, currState) => (currState is DetailsInitialState ||
             currState is RepoDetailsState ||

@@ -21,3 +21,4 @@ Map<String, dynamic> _$RepoDetailsModelToJson(RepoDetailsModel instance) =>
       'body': instance.body,
       'created_at': instance.createdAt,
     };
+

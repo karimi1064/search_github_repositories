@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:search_github_repositories/src/screens/home/bloc/github_repo_bloc.dart';
 import 'package:search_github_repositories/src/screens/home/model/repo_model.dart';
-import 'package:search_github_repositories/src/screens/home/repository/repos_list_repository.dart';
+import 'package:search_github_repositories/src/screens/home/repository/repos_list_repository_imp.dart';
 import 'package:search_github_repositories/src/screens/repository_details/page/repository_details_page.dart';
 
 import '../../../constants/string_constants.dart';
@@ -34,7 +34,7 @@ class _GithubRepoListState extends State<GithubRepoList> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          GithubRepoBloc(repoRepository: ReposListRepository()),
+          GithubRepoBloc(repoRepository: ReposListRepositoryImp()),
       child: BlocConsumer<GithubRepoBloc, GithubRepoState>(
         buildWhen: (_, currState) => (currState is RepoDetailsState ||
             currState is GithubRepoLoadingState ||
