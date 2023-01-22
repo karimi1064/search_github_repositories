@@ -7,24 +7,29 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:search_github_repositories/src/constants/string_constants.dart';
 import 'package:search_github_repositories/src/my_app.dart';
 
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets(
+    "MyApp has a title",
+    (tester) async {
+      await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+      // verify the title appears exactly once in the widget tree.
+      expect(find.text(appBarTitle), findsOneWidget);
+    },
+  );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('finds a widget using a Key', (tester) async {
+    // Define the test key.
+    const testKey = Key('K');
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Build MyApp with the testKey.
+    await tester.pumpWidget(const MyApp(key: testKey));
+
+    // Find the MaterialApp widget using the testKey.
+    expect(find.byKey(testKey), findsOneWidget);
   });
+
 }

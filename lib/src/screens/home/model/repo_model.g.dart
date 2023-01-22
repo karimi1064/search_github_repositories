@@ -7,11 +7,19 @@ part of 'repo_model.dart';
 // **************************************************************************
 
 RepoModel _$RepoModelFromJson(Map<String, dynamic> json) => RepoModel(
-      json['htmlUrl'] as String?,
-      json['watchersCount'] as int?,
-      json['language'] as String?,
-      json['description'] as String?,
-      json['name'] as String?,
-      json['owner'] as String?,
+      htmlUrl: json['url'] as String?,
+      watchersCount: json['watchers_count'] as int?,
+      language: json['language'] as String?,
+      description: json['description'] as String?,
+      name: json['name'] as String?,
+      owner: json['owner']['login'] as String?,
     );
 
+Map<String, dynamic> _$RepoModelToJson(RepoModel instance) => <String, dynamic>{
+      'url': instance.htmlUrl,
+      'watchers_count': instance.watchersCount,
+      'language': instance.language,
+      'description': instance.description,
+      'name': instance.name,
+      'owner': instance.owner,
+    };

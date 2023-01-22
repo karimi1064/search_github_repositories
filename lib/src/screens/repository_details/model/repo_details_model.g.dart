@@ -8,8 +8,16 @@ part of 'repo_details_model.dart';
 
 RepoDetailsModel _$RepoDetailsModelFromJson(Map<String, dynamic> json) =>
     RepoDetailsModel(
-      json['url'] as String?,
-      json['title'] as String?,
-      json['body'] as String?,
-      json['createdAt'] as String?,
+      url: json['url'] as String?,
+      title: json['title'] as String?,
+      body: json['body'] as String?,
+      createdAt: json['created_at'] as String?,
     );
+
+Map<String, dynamic> _$RepoDetailsModelToJson(RepoDetailsModel instance) =>
+    <String, dynamic>{
+      'url': instance.url,
+      'title': instance.title,
+      'body': instance.body,
+      'created_at': instance.createdAt,
+    };

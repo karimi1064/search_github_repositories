@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,7 +7,16 @@ import 'package:search_github_repositories/src/my_app.dart';
 
 void main() {
   Bloc.observer = GithubBlocObserve();
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
+}
+
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+  }
 }
 
 class GithubBlocObserve extends BlocObserver {
