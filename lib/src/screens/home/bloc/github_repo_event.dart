@@ -9,10 +9,9 @@ abstract class GithubRepoEvent extends Equatable {
 
 class RepoFetchEvent extends GithubRepoEvent {
   final String query;
-  final bool isShowCircularProgress;
 
   const RepoFetchEvent(
-      {required this.query, this.isShowCircularProgress = true});
+      {required this.query});
 }
 
 class RepoInitialEvent extends GithubRepoEvent {
