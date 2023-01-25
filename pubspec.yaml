@@ -15,8 +15,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   equatable: ^2.0.5
   flutter_bloc: ^8.1.1
-  url_launcher: ^6.1.7
-  http: ^0.13.5
   json_annotation: ^4.8.0
   dio: ^4.0.6
   mockito: ^5.3.2

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:search_github_repositories/src/screens/repository_details/bloc/details_bloc.dart';
@@ -28,54 +29,53 @@ class _RepoDetailsContentState extends State<RepoDetailsContent> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          DetailsBloc(repoDetailsRepository: RepoDetailsRepositoryImp()),
+          DetailsBloc(repoDetailsRepository: RepoDetailsRepositoryImp(Dio())),
       child: BlocConsumer<DetailsBloc, DetailsState>(
-        buildWhen: (_, currState) => (currState is DetailsInitialState ||
-            currState is RepoDetailsState ||
-            currState is DetailsLoadingState ||
-            currState is DetailsSuccessState ||
-            currState is DetailsBackPressedState ||
-            currState is DetailsErrorState),
         listener: (context, state) async {
           var repoBloc = BlocProvider.of<DetailsBloc>(context);
           if (state is DetailsInitialState) {
+            repoDetails.clear();
             repoBloc.add(RepoDetailsFetchEvent(
                 nameOfTheRepo: widget.name, ownerOfTheRepo: widget.owner));
-          } else if (state is DetailsLoadingState) {
           } else if (state is DetailsErrorState) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
             repoBloc.isFetching = false;
           } else if (state is DetailsBackPressedState) {
             Navigator.of(context).pop();
+          } else if (state is DetailsSuccessState) {
+            repoDetails.addAll(state.repoDetails);
+            BlocProvider.of<DetailsBloc>(context).isFetching = false;
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
           }
-          // return;
         },
+        buildWhen: (_, state) => (state is DetailsSuccessState ||
+            state is DetailsErrorState ||
+            state is DetailsSuccessState ||
+            state is DetailsInitialState ||
+            state is DetailsLoadingState),
+        // do not need rebuild when state is DetailsBackPressedState
         builder: (context, state) {
           final bloc = BlocProvider.of<DetailsBloc>(context);
           return RefreshIndicator(
-            onRefresh: () async {
-              bloc.add(const RepoDetailsInitialEvent());
-              bloc.add(RepoDetailsFetchEvent(
-                  nameOfTheRepo: widget.name, ownerOfTheRepo: widget.owner));
-            },
-            child: buildBody(context, state, bloc),
+            onRefresh: () async => bloc.add(const RepoDetailsInitialEvent()),
+            child: _buildBody(context, state, bloc),
           );
         },
       ),
     );
   }
 
-  Widget buildBody(BuildContext context, DetailsState state, bloc) {
-    if (state is DetailsLoadingState || state is DetailsInitialState) {
-      BlocProvider.of<DetailsBloc>(context).add(RepoDetailsFetchEvent(
+  Widget _buildBody(BuildContext context, DetailsState state, bloc) {
+    if (state is DetailsInitialState) {
+      bloc.add(RepoDetailsFetchEvent(
           nameOfTheRepo: widget.name, ownerOfTheRepo: widget.owner));
       return const Center(child: CircularProgressIndicator());
-    } else if (state is DetailsSuccessState) {
-      repoDetails = state.repoDetails;
-      BlocProvider.of<DetailsBloc>(context).isFetching = false;
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    } else if (state is DetailsErrorState) {
+    }
+    if (state is DetailsLoadingState) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (state is DetailsErrorState) {
       return AppRefreshSearch(
           onPressed: () {
             BlocProvider.of<DetailsBloc>(context)

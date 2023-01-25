@@ -20,7 +20,7 @@ Future<void> main() async {
   var response = '';
 
   setUp(() {
-    repoDetails = RepoDetailsRepositoryImp();
+    repoDetails = RepoDetailsRepositoryImp(Dio());
     mockDio.options = options;
   });
 

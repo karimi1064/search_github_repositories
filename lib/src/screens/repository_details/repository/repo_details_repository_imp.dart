@@ -3,11 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:search_github_repositories/src/screens/repository_details/repository/repo_details_repository.dart';
 
 class RepoDetailsRepositoryImp extends RepoDetailsRepository {
-  static const String _url = "https://api.github.com";
-  static const int _perPage = 10;
-  Dio dio = Dio();
+  final String _url = "https://api.github.com";
+  final int _perPage = 10;
+  final Dio _dio;
 
-  RepoDetailsRepositoryImp();
+  RepoDetailsRepositoryImp(this._dio);
 
   @override
   Future<dynamic> getRepoDetails({
@@ -21,10 +21,10 @@ class RepoDetailsRepositoryImp extends RepoDetailsRepository {
       receiveTimeout: 18000,
     );
 
-    dio.options = options;
+    _dio.options = options;
 
     try {
-      var response = await dio
+      var response = await _dio
           .get('/repos/$owner/$nameOfTheRepo/issues', queryParameters: {
         'state': 'open',
         'sort': 'created',

@@ -15,7 +15,7 @@ class ListItem extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: () => BlocProvider.of<GithubRepoBloc>(context)
-            .add(RepoDetailsEvent(repo)),
+            .add(RepoDetailsEvent(repo: repo)),
         highlightColor: Colors.grey,
         splashColor: Colors.white,
         child: Container(

@@ -82,6 +82,15 @@ void main() {
     });
   });
 
+  group("Test RepoModel initialization to JSON", () {
+    test('Test using repo one', () {
+      expect(expectedRepoDetailsOne.toJson(), repoDetailsOneAsJson);
+    });
+    test('Test using repo two', () {
+      expect(expectedRepoDetailsTwo.toJson(), repoDetailsTwoAsJson);
+    });
+  });
+
   group("Test mapJSONList To RepoList", () {
     test('Test mapJSONListToRepoList using json one', () {
       expect(

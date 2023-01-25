@@ -15,12 +15,6 @@ class DetailsLoadingState extends DetailsState {
   const DetailsLoadingState();
 }
 
-class RepoDetailsState extends DetailsState {
-  final RepoDetailsModel repo;
-
-  const RepoDetailsState({required this.repo});
-}
-
 class DetailsSuccessState extends DetailsState {
   final List<RepoDetailsModel> repoDetails;
 

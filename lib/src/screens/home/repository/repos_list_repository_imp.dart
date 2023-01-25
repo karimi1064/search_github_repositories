@@ -3,11 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:search_github_repositories/src/screens/home/repository/repos_list_repository.dart';
 
 class ReposListRepositoryImp extends ReposListRepository {
-  static const int _perPage = 10;
-  static const String _url = "https://api.github.com";
-  Dio dio = Dio();
+  final int _perPage = 10;
+  final String _url = "https://api.github.com";
+  final Dio _dio;
 
-  ReposListRepositoryImp();
+  ReposListRepositoryImp(this._dio);
 
   @override
   Future<dynamic> getRepos({required String query, required int page}) async {
@@ -17,10 +17,10 @@ class ReposListRepositoryImp extends ReposListRepository {
       receiveTimeout: 18000,
     );
 
-    dio.options = options;
+    _dio.options = options;
 
     try {
-      var response = await dio.get('/search/repositories', queryParameters: {
+      var response = await _dio.get('/search/repositories', queryParameters: {
         'q': query,
         'sort': 'name',
         'order': 'asc',

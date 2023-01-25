@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:search_github_repositories/src/screens/home/bloc/github_repo_bloc.dart';
@@ -27,6 +28,7 @@ class _GithubRepoListState extends State<GithubRepoList> {
   @override
   void dispose() {
     _searchQuery.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -34,32 +36,42 @@ class _GithubRepoListState extends State<GithubRepoList> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          GithubRepoBloc(repoRepository: ReposListRepositoryImp()),
+          GithubRepoBloc(repoRepository: ReposListRepositoryImp(Dio())),
       child: BlocConsumer<GithubRepoBloc, GithubRepoState>(
-        buildWhen: (_, currState) => (currState is RepoDetailsState ||
-            currState is GithubRepoLoadingState ||
-            currState is GithubRepoSuccessState ||
-            currState is GithubRepoErrorState),
         listener: (context, repoState) async {
           var repoBloc = BlocProvider.of<GithubRepoBloc>(context);
-          if (repoState is GithubRepoLoadingState) {
+          if (repoState is GithubRepoInitialState) {
+            _repositories.clear();
+          } else if (repoState is GithubRepoSuccessState) {
+            if (repoState.repos.isEmpty) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text(fetchAll)));
+            } else {
+              _repositories.addAll(repoState.repos);
+            }
+            BlocProvider.of<GithubRepoBloc>(context).isFetching = false;
           } else if (repoState is GithubRepoErrorState) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(repoState.error)));
             repoBloc.isFetching = false;
           } else if (repoState is RepoDetailsState) {
-            await Navigator.of(context).push(MaterialPageRoute(
+            Navigator.of(context).push(MaterialPageRoute(
               builder: (context) {
-                return RepositoryDetailsPage(
-                  repoModel: repoState.repo,
-                );
+                return RepositoryDetailsPage(repoModel: repoState.repo);
               },
-            ));
-            if (_searchQuery.text.length > 3) {
-              repoBloc.add(RepoFetchEvent(query: _searchQuery.text));
-            }
+            )).then(
+              (value) => repoBloc
+                ..add(const RepoInitialEvent())
+                ..isFetching = true
+                ..add(RepoFetchEvent(query: _searchQuery.text)),
+            );
           }
         },
+        buildWhen: (_, state) => (state is GithubRepoLoadingState ||
+            state is GithubRepoErrorState ||
+            state is GithubRepoInitialState ||
+            state is GithubRepoSuccessState),
+        // do not need rebuild when state is RepoDetailsState
         builder: (context, repoState) {
           final bloc = BlocProvider.of<GithubRepoBloc>(context);
           return Scaffold(
@@ -67,13 +79,15 @@ class _GithubRepoListState extends State<GithubRepoList> {
               appBar: AppBar(title: _buildSearchBox(bloc)),
               body: RefreshIndicator(
                   onRefresh: () async {
+                    _repositories.clear();
                     if (_searchQuery.text.length > 3) {
-                      _repositories.clear();
-                      bloc.add(const RepoInitialEvent());
-                      bloc.add(RepoFetchEvent(query: _searchQuery.text));
+                      bloc
+                        ..add(const RepoInitialEvent())
+                        ..isFetching = true
+                        ..add(RepoFetchEvent(query: _searchQuery.text));
                     }
                   },
-                  child: buildBody(context, repoState)));
+                  child: _buildBody(context, repoState)));
         },
       ),
     );
@@ -95,30 +109,27 @@ class _GithubRepoListState extends State<GithubRepoList> {
           hintText: searchRepo,
           hintStyle: TextStyle(color: Colors.white)),
       onChanged: (newValue) {
-        if (newValue.length > 3) {
-          _repositories.clear();
+        if (_repositories.isNotEmpty) {
           bloc.add(const RepoInitialEvent());
-          bloc.add(RepoFetchEvent(query: _searchQuery.text));
+        }
+        if (newValue.length > 3) {
+          bloc
+            ..isFetching = true
+            ..add(RepoFetchEvent(query: _searchQuery.text));
         }
       },
     );
   }
 
-  Widget buildBody(BuildContext context, GithubRepoState state) {
-    if (state is GithubRepoLoadingState) {
+  Widget _buildBody(BuildContext context, GithubRepoState state) {
+    if (state is GithubRepoLoadingState && _repositories.isEmpty) {
       return const Center(child: CircularProgressIndicator());
-    } else if (state is GithubRepoSuccessState) {
-      _repositories.addAll(state.repos);
-      BlocProvider.of<GithubRepoBloc>(context).isFetching = false;
-    } else if (state is GithubRepoErrorState &&
-        _repositories.isNotEmpty &&
-        _searchQuery.text.length > 3) {
+    }
+    if (state is GithubRepoErrorState) {
       return AppRefreshSearch(
-          onPressed: () {
-            BlocProvider.of<GithubRepoBloc>(context)
-              ..isFetching = true
-              ..add(RepoFetchEvent(query: _searchQuery.text));
-          },
+          onPressed: () => BlocProvider.of<GithubRepoBloc>(context)
+            ..isFetching = true
+            ..add(RepoFetchEvent(query: _searchQuery.text)),
           error: state.error);
     }
     return (_repositories.isEmpty)

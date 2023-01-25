@@ -5,7 +5,10 @@ part 'repo_model.g.dart';
 
 @JsonSerializable()
 class RepoModel extends Equatable {
+  @JsonKey(name: 'url')
   final String? htmlUrl;
+
+  @JsonKey(name: 'watchers_count')
   final int? watchersCount;
   final String? language;
   final String? description;

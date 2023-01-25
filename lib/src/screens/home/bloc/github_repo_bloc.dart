@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,16 +14,16 @@ class GithubRepoBloc extends Bloc<GithubRepoEvent, GithubRepoState> {
   int page = 0;
   bool isFetching = false;
 
-  GithubRepoBloc({
-    required this.repoRepository,
-  }) : super(const GithubRepoInitialState()) {
+  GithubRepoBloc({required this.repoRepository})
+      : super(const GithubRepoInitialState()) {
     on<GithubRepoEvent>((event, emit) async {
       if (event is RepoInitialEvent) {
         page = 0;
+        emit(const GithubRepoInitialState());
       } else if (event is RepoFetchEvent) {
         emit(const GithubRepoLoadingState());
 
-        final response = await ReposListRepositoryImp().getRepos(
+        final response = await repoRepository.getRepos(
           page: page,
           query: event.query,
         );
@@ -33,11 +32,7 @@ class GithubRepoBloc extends Bloc<GithubRepoEvent, GithubRepoState> {
         } else {
           List<RepoModel> dataList =
               RepoModel.mapJSONListToRepoList(response['items']);
-          emit(
-            GithubRepoSuccessState(
-              repos: dataList,
-            ),
-          );
+          emit(GithubRepoSuccessState(repos: dataList));
           page++;
         }
       } else if (event is RepoDetailsEvent) {

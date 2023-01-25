@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,15 +13,15 @@ class DetailsBloc extends Bloc<DetailsEvent, DetailsState> {
   bool isFetching = false;
   int page = 0;
 
-  DetailsBloc({
-    required this.repoDetailsRepository,
-  }) : super(const DetailsInitialState()) {
+  DetailsBloc({required this.repoDetailsRepository})
+      : super(const DetailsInitialState()) {
     on<DetailsEvent>((event, emit) async {
       if (event is RepoDetailsInitialEvent) {
         page = 0;
+        emit(const DetailsInitialState());
       } else if (event is RepoDetailsFetchEvent) {
         emit(const DetailsLoadingState());
-        final response = await RepoDetailsRepositoryImp().getRepoDetails(
+        final response = await repoDetailsRepository.getRepoDetails(
             page: page,
             nameOfTheRepo: event.nameOfTheRepo,
             owner: event.ownerOfTheRepo);
@@ -32,10 +31,9 @@ class DetailsBloc extends Bloc<DetailsEvent, DetailsState> {
           List<RepoDetailsModel> dataList =
               RepoDetailsModel.mapJSONListToRepoDetailsList(response);
           emit(
-            DetailsSuccessState(
-              repoDetails: dataList,
-            ),
+            DetailsSuccessState(repoDetails: dataList),
           );
+          page++;
         }
       } else if (event is RepoBackPressedEvent) {
         emit(const DetailsBackPressedState());

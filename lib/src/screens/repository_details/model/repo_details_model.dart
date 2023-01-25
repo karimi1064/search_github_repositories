@@ -8,6 +8,7 @@ class RepoDetailsModel extends Equatable {
   final String? url;
   final String? title;
   final String? body;
+  @JsonKey(name: 'created_at')
   final String? createdAt;
 
   const RepoDetailsModel({this.url, this.title, this.body, this.createdAt});
